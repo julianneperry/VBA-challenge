@@ -1,0 +1,53 @@
+Sub VBAStocks()
+'Populate column headers
+    Cells(1, 9).Value = "Ticker"
+    Cells(1, 10).Value = "Yearly Change"
+    Cells(1, 11).Value = "Percent Change"
+    Cells(1, 12).Value = "Total Stock Volume"
+    Cells(2, 9).Value = Cells(2, 1)
+'Set variables
+Dim Ticker As String
+Dim StockVolume As Double
+Dim StartRow As Double
+Dim EndRow As Double
+Dim OpenPrice As Double
+Dim ClosePrice As Double
+Dim PercentChange As Double
+StockVolume = 0
+'Set a variable for the summary table row to put the Ticker info in and start on the second row under the column headers
+Dim SummaryTable As Integer
+SummaryTable = 2
+'Set the first OpenPrice
+StartRow = 2
+'Set a variable as the count of the rows in the data set
+RowCount = Cells(Rows.Count, "a").End(xlUp).Row
+'Loop through column 1 for unique tickers
+    For i = 2 To RowCount
+        If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+            Ticker = Cells(i, 1).Value
+            StockVolume = StockVolume + Cells(i, 7).Value
+            'Set End row as this is the different last row
+            EndRow = i
+            OpenPrice = Cells(StartRow, 3)
+            ClosePrice = Cells(i, 6)
+            YearlyChange = ClosePrice - OpenPrice
+            Cells(SummaryTable, 10) = YearlyChange
+            'Calculate Percent Change
+            PercentChange = Round((YearlyChange / OpenPrice) * 100, 2)
+            Cells(SummaryTable, 11) = PercentChange
+            'Reset start row to the new ticker
+            StartRow = i + 1
+            'Add the stock volume
+            Cells(SummaryTable, 12).Value = StockVolume
+            'If unique, put the Ticker in the summary list and add a row
+            Range("I" & SummaryTable).Value = Ticker
+            SummaryTable = SummaryTable + 1
+            'Reset the stock volume to 0 for the next stock
+            StockVolume = 0
+            'If the Ticker is the same as the row before, add the volume
+        Else
+            StockVolume = StockVolume + Cells(i, 7).Value
+        End If
+    Next i
+   
+End Sub
